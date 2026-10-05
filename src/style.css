@@ -285,7 +285,7 @@ body.dev #banner { opacity: 1; animation: none; }
   text-align: center;
   z-index: 5;
 }
-/* 選單內容以 400×780 為設計尺寸，依舞台大小整體縮放 */
+/* 選單內容以 400×860 為設計尺寸（含球員頭像的隊伍卡片），依舞台大小整體縮放 */
 .screen > * { zoom: var(--zoom, 1); }
 #menu { background: linear-gradient(180deg, rgba(7, 11, 22, 0.86) 0%, rgba(7, 11, 22, 0.5) 42%, rgba(7, 11, 22, 0.9) 100%); }
 .screen.dim { background: rgba(7, 11, 22, 0.78); backdrop-filter: blur(3px); }

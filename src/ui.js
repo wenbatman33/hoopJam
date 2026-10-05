@@ -175,7 +175,7 @@ export class UI {
   // 套用版面：位置為舞台百分比，大小乘上舞台縮放
   applyLayout(layout, stageW, stageH) {
     this.uiScale = Math.max(0.6, Math.min(1.5, stageW / 400));
-    this.g.app.style.setProperty('--zoom', Math.min(stageW / 400, stageH / 780).toFixed(3));
+    this.g.app.style.setProperty('--zoom', Math.min(stageW / 400, stageH / 860).toFixed(3));
     const s = this.uiScale;
     for (const [k, cfg] of Object.entries(layout.hud)) {
       const el = this.el[k];
