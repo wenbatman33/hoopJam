@@ -9,7 +9,7 @@ import { POSE_KEYS } from './poses.js';
 // - 依骨骼權重把連帽衫 / 長褲重新上色成無袖球衣 + 短褲
 // - 基礎動畫（Idle / Run / 側跑 / Death）之上，用「骨骼瞄準」疊加手臂動作（運球、投籃、灌籃…）
 
-const BASE = import.meta.env.BASE_URL + 'models/';
+const BASE = new URL('../assets/models/', import.meta.url).href;
 
 // 姿勢鍵 → 骨頭名稱（GLTFLoader 會把名稱中的 "." 去掉）
 const ARM_BONES = { uaL: 'UpperArmL', faL: 'LowerArmL', hL: 'WristL', uaR: 'UpperArmR', faR: 'LowerArmR', hR: 'WristR' };

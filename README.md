@@ -5,11 +5,14 @@ NBA Jam 風格的 2v2 街機籃球：誇張灌籃、沒有犯規、可以推人�
 
 ## 執行
 
+免打包的 ESM 專案：`index.html` 用 import map 直接載入 `vendor/` 內的 three.js 與 lil-gui，不需要 npm、不需要 build。
+因為用了 ES module，不能直接雙擊 `index.html`，要透過任一靜態伺服器開啟：
+
 ```bash
-npm install
-npm run dev      # http://localhost:5288（同網段手機可用電腦 IP 連入）
-npm run build    # 輸出到 dist/
+python3 serve.py        # http://localhost:5288（同網段手機可用電腦 IP 連入）
 ```
+
+推到 `main` 後，`.github/workflows/deploy.yml` 會把 repo 內容原樣部署到 GitHub Pages。
 
 ## 操作
 
@@ -54,4 +57,4 @@ npm run build    # 輸出到 dist/
 | `src/court.js` `src/textures.js` `src/effects.js` | 球場、程序化貼圖、粒子 |
 | `src/ui.js` `src/input.js` `src/audio.js` `src/devtools.js` | 介面、輸入、合成音效、DEV 工具 |
 
-角色模型來源見 `public/models/CREDITS.md`。
+角色模型來源見 `assets/models/CREDITS.md`；第三方函式庫版本見 `vendor/README.md`。
