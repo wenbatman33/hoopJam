@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a1020" />
+  <title>HOOP JAM · 2 on 2 街機籃球</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23f27a1a' stroke='%231b1008' stroke-width='4'/%3E%3Cpath d='M3 32h58M32 3v58M12 11c12 10 12 32 0 42M52 11c-12 10-12 32 0 42' fill='none' stroke='%231b1008' stroke-width='3'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Noto+Sans+TC:wght@700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <!-- 直式舞台：手機滿版、PC 置中 -->
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <!-- 比賽中 HUD（每個 data-hud 元件都可在 DEV 模式拖曳）-->
+    <div id="hud" class="hidden">
+      <div id="scoreboard" class="hud-el" data-hud="scoreboard">
+        <div class="sb-team" id="sbHomeBox"><span class="sb-abbr" id="sbHomeAbbr">HOME</span><b id="sbHome">0</b></div>
+        <div class="sb-mid"><span id="sbQuarter">Q1</span><b id="sbClock">1:00</b><i id="sbShot">24</i></div>
+        <div class="sb-team away" id="sbAwayBox"><b id="sbAway">0</b><span class="sb-abbr" id="sbAwayAbbr">AWAY</span></div>
+      </div>
+      <div id="turboBox" class="hud-el" data-hud="turbo">
+        <span class="lbl" id="turboName">TURBO</span>
+        <div class="bar"><i id="turboFill"></i></div>
+      </div>
+      <button id="btnPause" class="hud-el" data-hud="pause" aria-label="暫停"><span></span><span></span></button>
+      <div id="stick" class="hud-el touch-only" data-hud="stick"><div id="stickKnob"></div></div>
+      <div id="btnA" class="hud-el touch-only act-btn" data-hud="btnA"><span id="lblA">投籃</span></div>
+      <div id="btnB" class="hud-el touch-only act-btn" data-hud="btnB"><span id="lblB">傳球</span></div>
+      <div id="btnC" class="hud-el touch-only act-btn" data-hud="btnC"><span>渦輪</span></div>
+      <div id="btnSw" class="hud-el touch-only act-btn" data-hud="btnSw"><span>換人</span></div>
+      <div id="hint" class="hud-el key-only" data-hud="hint">WASD 移動　J 投籃 / 跳　K 傳球 / 抄截　L 渦輪　空白鍵 換人</div>
+    </div>
+    <div id="banner" class="hud-el" data-hud="banner"></div>
+    <div id="popups"></div>
+
+    <!-- 主選單 -->
+    <div id="menu" class="screen hidden">
+      <div class="logo">
+        <div class="logo-top">HOOP</div>
+        <div class="logo-bot">JAM</div>
+        <div class="logo-sub">2 ON 2 街機籃球</div>
+      </div>
+      <div class="pick">
+        <div class="pick-label">你的隊伍</div>
+        <div class="pick-row">
+          <button class="arrow" id="homePrev">◀</button>
+          <div class="team-card" id="homeCard"></div>
+          <button class="arrow" id="homeNext">▶</button>
+        </div>
+      </div>
+      <div class="pick">
+        <div class="pick-label">對手</div>
+        <div class="pick-row">
+          <button class="arrow" id="awayPrev">◀</button>
+          <div class="team-card small" id="awayCard"></div>
+          <button class="arrow" id="awayNext">▶</button>
+        </div>
+      </div>
+      <div class="opts">
+        <div class="opt-group" id="optDiff"></div>
+        <div class="opt-group" id="optTime"></div>
+      </div>
+      <button id="btnPlay" class="big-btn">開始比賽</button>
+      <div class="help key-only">WASD / 方向鍵 移動　J 投籃・跳　K 傳球・抄截　L 渦輪<br />渦輪 + J 靠近籃框 = 灌籃　渦輪 + K = 推人</div>
+      <div class="help touch-only-text">搖桿移動 · 按住投籃鍵在最高點放開最準 · 渦輪 + 投籃 = 灌籃</div>
+      <button id="btnSound" class="small-btn">🔊 音效：開</button>
+    </div>
+
+    <!-- 暫停 -->
+    <div id="pauseScreen" class="screen dim hidden">
+      <div class="title">暫停</div>
+      <button id="btnResume" class="big-btn">繼續</button>
+      <button id="btnRestart" class="mid-btn">重新開始</button>
+      <button id="btnHome" class="mid-btn">回主選單</button>
+      <button id="btnSound2" class="small-btn">🔊 音效：開</button>
+    </div>
+
+    <!-- 節間 -->
+    <div id="breakScreen" class="screen dim hidden">
+      <div class="title" id="breakTitle">第 1 節結束</div>
+      <div class="final-score" id="breakScore"></div>
+      <button id="btnNext" class="big-btn">下一節</button>
+    </div>
+
+    <!-- 終場 -->
+    <div id="overScreen" class="screen dim hidden">
+      <div class="title over-title" id="overTitle">勝利！</div>
+      <div class="final-score" id="overScore"></div>
+      <div class="stats" id="overStats"></div>
+      <button id="btnAgain" class="big-btn">再來一場</button>
+      <button id="btnMenu" class="mid-btn">主選單</button>
+    </div>
+
+    <div id="loading"><div class="spinner"></div><div>載入中…</div></div>
+    <button id="devBtn" title="開發者微調工具 (` 或 F2)">⚙</button>
+    <div id="devHint" class="hidden">DEV 模式：可直接拖曳 HUD 與按鍵</div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
