@@ -48,6 +48,7 @@ export class Effects {
     this.points = new THREE.Points(geo, mat);
     this.points.frustumCulled = false;
     this.points.renderOrder = 10;
+    this.points.layers.enable(1);
     scene.add(this.points);
   }
 

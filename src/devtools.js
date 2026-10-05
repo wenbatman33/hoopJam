@@ -74,6 +74,17 @@ export class DevTools {
     fc.add(L.camera, 'zMin', -14, 0, 0.1).name('遠端極限 z').onChange(ch);
     fc.add(L.camera, 'zMax', 0, 14, 0.1).name('近端極限 z').onChange(ch);
 
+    // 蓋板特寫
+    const fci = gui.addFolder(`🎬 蓋板特寫（${this.editProfile}）`);
+    fci.add(L.cutin, 'y', 10, 90, 0.5).name('中心高度 %').onChange(ch);
+    fci.add(L.cutin, 'h', 8, 60, 0.5).name('帶狀高度 %').onChange(ch);
+    fci.add(TUNING, 'cutinDunkChance', 0, 1, 0.05).name('灌籃出現機率').onChange(ch);
+    fci.add(TUNING, 'cutinTime', 0.3, 3, 0.05).name('灌籃特寫秒數').onChange(ch);
+    fci.add(TUNING, 'cutinSlow', 0.02, 1, 0.01).name('特寫時遊戲速度').onChange(ch);
+    fci.add(TUNING, 'cutinFireTime', 0.3, 4, 0.05).name('著火特寫秒數').onChange(ch);
+    fci.add({ play: () => { if (this._play()) { const u = g.match.user || g.match.players[0]; g.cutin(u, u.info.name, 'SLAM DUNK!', 3, 0.3); } } }, 'play').name('▶ 預覽 3 秒');
+    fci.close();
+
     // HUD
     const fh = gui.addFolder(`HUD / 按鍵（${this.editProfile}）— 可直接拖曳`);
     const names = {

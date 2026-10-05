@@ -39,6 +39,7 @@ export class Ball {
     );
     this.shadow.rotation.x = -Math.PI / 2;
     this.shadow.renderOrder = 1;
+    this.mesh.layers.enable(1);
     match.scene.add(this.mesh, this.shadow);
   }
 

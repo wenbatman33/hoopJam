@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { COURT } from './config.js';
+import { COURT, accentOf } from './config.js';
 
 // 程序化貼圖：球場地板、籃球、觀眾、籃網、陰影、號碼
 
@@ -62,8 +62,8 @@ export function courtTexture(home, away) {
     g.fillRect(X(-keyHalfW), Z(z0), keyHalfW * 2 * S, keyLen * S);
     g.globalAlpha = 1;
   };
-  paintKey(1, home.jersey);
-  paintKey(-1, away.jersey);
+  paintKey(1, home.color);
+  paintKey(-1, away.color);
 
   // 中圈
   g.fillStyle = '#16233f';
@@ -133,9 +133,9 @@ export function courtTexture(home, away) {
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.font = `${1.25 * S}px ${FONT_EN}`;
-  g.fillStyle = home.jersey;
+  g.fillStyle = accentOf(home);
   g.fillText(home.en, X(0), Z(halfL + apron * 0.52));
-  g.fillStyle = away.jersey;
+  g.fillStyle = accentOf(away);
   g.fillText(away.en, X(0), Z(-halfL - apron * 0.52));
   // 邊線外標語
   g.font = `${0.8 * S}px ${FONT_EN}`;
@@ -333,6 +333,40 @@ export function sparkTexture() {
   gr.addColorStop(1, 'rgba(255,255,255,0)');
   g.fillStyle = gr;
   g.fillRect(0, 0, 64, 64);
+  return toTexture(c);
+}
+
+// 蓋板特寫的背景：隊色漸層 + 放射光
+export function cutinTexture(color, trim) {
+  const [c, g] = makeCanvas(256, 128);
+  const base = new THREE.Color(color);
+  const hex = (k) => `#${base.clone().multiplyScalar(k).getHexString()}`;
+  const lg = g.createLinearGradient(0, 0, 0, 128);
+  lg.addColorStop(0, hex(0.45));
+  lg.addColorStop(0.5, hex(1));
+  lg.addColorStop(1, hex(0.4));
+  g.fillStyle = lg;
+  g.fillRect(0, 0, 256, 128);
+  // 放射光束
+  g.save();
+  g.translate(128, 64);
+  g.fillStyle = trim;
+  for (let i = 0; i < 18; i++) {
+    g.globalAlpha = 0.1 + (i % 3) * 0.05;
+    g.rotate((Math.PI * 2) / 18);
+    g.beginPath();
+    g.moveTo(0, 0);
+    g.lineTo(260, -13);
+    g.lineTo(260, 13);
+    g.closePath();
+    g.fill();
+  }
+  g.restore();
+  const rg = g.createRadialGradient(128, 64, 4, 128, 64, 120);
+  rg.addColorStop(0, 'rgba(255,255,255,0.4)');
+  rg.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = rg;
+  g.fillRect(0, 0, 256, 128);
   return toTexture(c);
 }
 

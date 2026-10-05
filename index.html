@@ -48,6 +48,13 @@
     <div id="banner" class="hud-el" data-hud="banner"></div>
     <div id="popups"></div>
 
+    <!-- 蓋板動畫：球員特寫過場（中間視窗由 3D 第二鏡頭畫在 canvas 上）-->
+    <div id="cutin" class="hidden">
+      <div class="ci-band"><div id="ciWindow"></div></div>
+      <div class="ci-sub" id="ciSub"></div>
+      <div class="ci-title" id="ciTitle"></div>
+    </div>
+
     <!-- 主選單 -->
     <div id="menu" class="screen hidden">
       <div class="logo">
@@ -79,6 +86,20 @@
       <div class="help key-only">WASD / 方向鍵 移動　J 投籃・跳　K 傳球・抄截　L 渦輪<br />渦輪 + J 靠近籃框 = 灌籃　渦輪 + K = 推人</div>
       <div class="help touch-only-text">搖桿移動 · 按住投籃鍵在最高點放開最準 · 渦輪 + 投籃 = 灌籃</div>
       <button id="btnSound" class="small-btn">🔊 音效：開</button>
+      <div class="legal">非官方同人作品，與 NBA、各球隊及球員無任何關聯</div>
+    </div>
+
+    <!-- 選隊格狀選單 -->
+    <div id="gridScreen" class="screen dim hidden">
+      <div class="title tg-title" id="tgTitle">選擇你的隊伍</div>
+      <div class="tg-conf">東區</div>
+      <div class="tg-list" id="tgEast"></div>
+      <div class="tg-conf">西區</div>
+      <div class="tg-list" id="tgWest"></div>
+      <div class="tg-foot">
+        <button id="tgRandom" class="mid-btn">🎲 隨機對手</button>
+        <button id="tgClose" class="mid-btn">返回</button>
+      </div>
     </div>
 
     <!-- 暫停 -->

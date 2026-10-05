@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TUNING, COURT, DIFFICULTY, MATE_AI } from './config.js';
+import { TUNING, COURT, DIFFICULTY, MATE_AI, resolveKits, accentOf } from './config.js';
 import { Baller } from './models.js';
 import { Player } from './player.js';
 import { Ball } from './ball.js';
@@ -22,7 +22,7 @@ export class Match {
     this.fx = game.fx;
     this.ui = game.ui;
     this.court = game.court;
-    this.teams = opts.teams;
+    this.teams = resolveKits(opts.teams[0], opts.teams[1]); // 撞色時客隊換客場球衣
     this.diff = DIFFICULTY[opts.difficulty] || DIFFICULTY.normal;
     this.demo = !!opts.demo;
     this.quarterSeconds = opts.quarterSeconds || TUNING.quarterSeconds;
@@ -279,14 +279,22 @@ export class Match {
     if (kind !== 'dunk') this.audio.swish();
     this.audio.cheer(kind === 'dunk' || points === 3 ? 1 : 0.5);
     if (demo) return;
-    this.ui.popup(`+${points}`, this.hoops[team], this.teams[team].jersey, true);
+    this.ui.popup(`+${points}`, this.hoops[team], accentOf(this.teams[team]), true);
     if (fire === 2) {
-      this.ui.banner(`${shooter.info.name} 著火了！`, '#ff7a1a', true);
+      this.g.cutin(shooter, `${shooter.info.name} 著火了！`, 'ON FIRE!', TUNING.cutinFireTime, 0.45);
       this.audio.fire();
     } else if (kind === 'dunk') this.ui.banner(pick(['SLAM!', 'KABOOM!', '灌籃！', 'MONSTER JAM!', 'THROW IT DOWN!']), '#ffe14a', true);
     else if (points === 3) this.ui.banner(pick(['三分球！', 'FROM DOWNTOWN!', 'SPLASH!']), '#6fe3ff');
     else if (fire === 1) this.ui.banner('手感發燙！', '#ffb347');
     this.ui.pulseScore(team);
+  }
+
+  // 灌籃起跳：有機率出現蓋板特寫（空翻 / 著火灌籃必出）
+  onDunkStart(p) {
+    if (this.demo) return;
+    if (p.dk.flip || p.onFire || Math.random() < TUNING.cutinDunkChance) {
+      this.g.cutin(p, p.info.name, pick(['SLAM DUNK!', 'JAM TIME!', 'POSTER!', 'TAKE FLIGHT!']), TUNING.cutinTime, TUNING.cutinSlow);
+    }
   }
 
   onMiss(hoopIdx) {

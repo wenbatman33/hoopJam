@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { TEAMS, DIFFICULTY, TUNING } from './config.js';
+import { TEAMS, DIFFICULTY, TUNING, inkOn, accentOf, luma } from './config.js';
 
 // HUD 與選單（DOM）。版面位置由 LAYOUT_PC / LAYOUT_MOBILE 決定，可在 DEV 工具拖曳
 
@@ -11,6 +11,13 @@ const HUD_IDS = {
   stick: 'stick', btnA: 'btnA', btnB: 'btnB', btnC: 'btnC', btnSw: 'btnSw', hint: 'hint',
 };
 const SCREENS = { menu: 'menu', pause: 'pauseScreen', break: 'breakScreen', over: 'overScreen' };
+
+// 把隊伍底色與對應文字色寫到元素的 CSS 變數
+function paint(el, color) {
+  el.style.setProperty('--c', color);
+  el.style.setProperty('--fg', inkOn(color));
+  el.classList.toggle('light', luma(color) > 150);
+}
 
 export class UI {
   constructor(game) {
@@ -45,6 +52,10 @@ export class UI {
     // 對手：-1 = 隨機
     click('awayPrev', () => { S.opp = S.opp <= -1 ? n - 1 : S.opp - 1; this._menu(); });
     click('awayNext', () => { S.opp = S.opp >= n - 1 ? -1 : S.opp + 1; this._menu(); });
+    $('homeCard').addEventListener('click', () => { game.audio.click(); this._grid('home'); });
+    $('awayCard').addEventListener('click', () => { game.audio.click(); this._grid('away'); });
+    click('tgClose', () => $('gridScreen').classList.add('hidden'));
+    click('tgRandom', () => { S.opp = -1; this._menu(); $('gridScreen').classList.add('hidden'); });
     this._opts('optDiff', Object.entries(DIFFICULTY).map(([k, d]) => [k, d.label]), 'difficulty');
     this._opts('optTime', [[45, '每節 45 秒'], [60, '每節 60 秒'], [90, '每節 90 秒']], 'quarter');
     this._menu();
@@ -77,18 +88,50 @@ export class UI {
     if (!team) {
       el.style.removeProperty('--c');
       el.style.removeProperty('--t');
+      el.style.removeProperty('--fg');
+      el.classList.remove('light');
       el.innerHTML = '<div class="tc-name">RANDOM<small>隨機對手</small></div>';
       return;
     }
-    el.style.setProperty('--c', team.jersey);
-    el.style.setProperty('--t', team.trim);
+    paint(el, team.color);
+    el.style.setProperty('--t', luma(team.trim) < 70 ? '#ffffff' : team.trim);
     const stat = (label, v) => `<div class="stat"><span>${label}</span><div class="sbar"><b style="width:${v * 10}%"></b></div></div>`;
     const players = small ? '' : `<div class="tc-players">${team.players.map((p) => `
       <div class="tc-player">
         <div class="nm"><span>${p.name}</span><i>#${p.num}</i></div>
+        <div class="en">${p.en}</div>
         ${stat('速度', p.spd)}${stat('投籃', p.sht)}${stat('灌籃', p.dnk)}${stat('防守', p.def)}
       </div>`).join('')}</div>`;
-    el.innerHTML = `<div class="tc-name">${team.en}<small>${team.name}</small></div>${players}`;
+    el.innerHTML = `<div class="tc-name">${team.en}<small>${team.city} ${team.name}</small></div>${players}`;
+  }
+
+  // 30 隊格狀選單（mode: 'home' 選自己 / 'away' 選對手）
+  _grid(mode) {
+    const S = this.g.settings;
+    const cur = mode === 'home' ? S.team : S.opp;
+    $('tgTitle').textContent = mode === 'home' ? '選擇你的隊伍' : '選擇對手';
+    $('tgRandom').classList.toggle('hidden', mode === 'home');
+    for (const [conf, id] of [['E', 'tgEast'], ['W', 'tgWest']]) {
+      const box = $(id);
+      box.innerHTML = '';
+      TEAMS.forEach((t, i) => {
+        if (t.conf !== conf) return;
+        const b = document.createElement('button');
+        b.className = 'tg-chip' + (cur === i ? ' on' : '');
+        paint(b, t.color);
+        b.innerHTML = `<b>${t.abbr}</b><span>${t.name}</span>`;
+        b.disabled = mode === 'away' && i === S.team;
+        b.addEventListener('click', () => {
+          if (mode === 'home') S.team = i;
+          else S.opp = i;
+          this.g.audio.click();
+          this._menu();
+          $('gridScreen').classList.add('hidden');
+        });
+        box.appendChild(b);
+      });
+    }
+    $('gridScreen').classList.remove('hidden');
   }
 
   _menu() {
@@ -103,13 +146,14 @@ export class UI {
   show(name) {
     for (const [k, id] of Object.entries(SCREENS)) $(id).classList.toggle('hidden', k !== name);
     $('hud').classList.toggle('hidden', name === 'menu');
+    if (name !== 'menu') $('gridScreen').classList.add('hidden');
   }
 
   setTeams(home, away) {
     $('sbHomeAbbr').textContent = home.abbr;
     $('sbAwayAbbr').textContent = away.abbr;
-    $('sbHomeBox').style.setProperty('--c', home.jersey);
-    $('sbAwayBox').style.setProperty('--c', away.jersey);
+    paint($('sbHomeBox'), home.color);
+    paint($('sbAwayBox'), away.color);
     this.last = {};
   }
 
@@ -129,6 +173,10 @@ export class UI {
       } else if (k === 'hint') el.style.fontSize = cfg.size * s + 'px';
       else el.style.scale = String(cfg.size * s);
     }
+    const ci = $('cutin');
+    ci.style.top = layout.cutin.y + '%';
+    ci.style.height = layout.cutin.h + '%';
+    ci.style.setProperty('--s', s.toFixed(3));
   }
 
   banner(text, color, big = false) {
@@ -139,6 +187,22 @@ export class UI {
     void el.offsetWidth; // 重新觸發動畫
     el.classList.add('show');
     if (big) el.classList.add('big');
+  }
+
+  // 蓋板特寫：顯示帶狀框與文字（中間的 3D 特寫由 Game 用第二鏡頭畫）
+  cutin(title, sub, team, time) {
+    const el = $('cutin');
+    $('ciTitle').textContent = title;
+    $('ciSub').textContent = sub;
+    el.style.setProperty('--t', luma(team.trim) < 110 ? '#ffffff' : team.trim); // 配色太暗時改白字
+    el.style.setProperty('--dur', time + 's');
+    el.classList.add('hidden');
+    void el.offsetWidth; // 重新觸發動畫
+    el.classList.remove('hidden');
+  }
+
+  cutinEnd() {
+    $('cutin').classList.add('hidden');
   }
 
   // 世界座標飄字
@@ -198,10 +262,8 @@ export class UI {
   }
 
   scoreHTML(m) {
-    const t = m.teams;
-    return `<div class="fs-team" style="--c:${t[0].jersey}"><small>${t[0].en}</small><b>${m.score[0]}</b></div>
-      <div class="vs">VS</div>
-      <div class="fs-team" style="--c:${t[1].jersey}"><small>${t[1].en}</small><b>${m.score[1]}</b></div>`;
+    const box = (t, score) => `<div class="fs-team${luma(t.color) > 150 ? ' light' : ''}" style="--c:${t.color};--fg:${inkOn(t.color)}"><small>${t.en}</small><b>${score}</b></div>`;
+    return `${box(m.teams[0], m.score[0])}<div class="vs">VS</div>${box(m.teams[1], m.score[1])}`;
   }
 
   showBreak(m, title, btn) {
@@ -218,7 +280,7 @@ export class UI {
     t.classList.toggle('lose', !win);
     $('overScore').innerHTML = this.scoreHTML(m);
     const rows = m.players.map((p) => `<tr>
-      <td class="nm"><i style="background:${p.teamDef.jersey}"></i>${p.info.name}</td>
+      <td class="nm"><i style="background:${accentOf(p.teamDef)}"></i>${p.info.name}</td>
       <td class="pts">${p.stats.pts}</td><td>${p.stats.three}</td><td>${p.stats.dunk}</td>
       <td>${p.stats.reb}</td><td>${p.stats.stl}</td><td>${p.stats.blk}</td></tr>`).join('');
     $('overStats').innerHTML = `<table><tr><th></th><th>得分</th><th>三分</th><th>灌籃</th><th>籃板</th><th>抄截</th><th>火鍋</th></tr>${rows}</table>`;

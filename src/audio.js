@@ -159,6 +159,11 @@ export class GameAudio {
     this._tone('sawtooth', 220, 880, 0.5, 0.1);
   }
 
+  cutin() {
+    this._noise(0.35, 0.3, 'bandpass', 400, 4200, 0.9);
+    this._tone('sawtooth', 110, 440, 0.25, 0.12);
+  }
+
   click() {
     this._tone('square', 660, 880, 0.06, 0.08);
   }

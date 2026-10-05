@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { COURT, VISUAL } from './config.js';
+import { COURT, VISUAL, accentOf } from './config.js';
 import { courtTexture, crowdTexture, netTexture, boardTexture, adTexture } from './textures.js';
 
 // 球場、籃架、觀眾席。hoops[i] = 隊伍 i 進攻的籃框（0 遠端 -Z、1 近端 +Z）
@@ -38,8 +38,8 @@ export class Court {
     this.floorMat.map?.dispose();
     this.floorMat.map = courtTexture(home, away);
     this.floorMat.needsUpdate = true;
-    this.adMats[0].color.set(home.jersey);
-    this.adMats[1].color.set(away.jersey);
+    this.adMats[0].color.set(accentOf(home));
+    this.adMats[1].color.set(accentOf(away));
   }
 
   // 四面觀眾席（斜面 + 觀眾貼圖）

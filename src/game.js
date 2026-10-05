@@ -6,11 +6,13 @@ import { GameAudio } from './audio.js';
 import { Input } from './input.js';
 import { UI } from './ui.js';
 import { Match } from './match.js';
+import { cutinTexture } from './textures.js';
 
 // 遊戲主體：渲染、鏡頭、狀態流程（選單示範賽 → 比賽 → 節間 → 終場）
 
 const SETTINGS_KEY = 'hoopjam_settings_v1';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const _v = new THREE.Vector3();
 
 export class Game {
   constructor(canvas, models) {
@@ -24,7 +26,7 @@ export class Game {
     this.shakeT = 0;
     this.shakeAmp = 0;
     this.camF = new THREE.Vector3(0, 0, 0);
-    this.settings = { team: 0, opp: -1, difficulty: 'normal', quarter: 60 };
+    this.settings = { team: Math.max(0, TEAMS.findIndex((t) => t.abbr === 'LAL')), opp: -1, difficulty: 'normal', quarter: 60 };
     try { Object.assign(this.settings, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')); } catch (e) { /* 忽略 */ }
     if (!TEAMS[this.settings.team]) this.settings.team = 0;
 
@@ -40,6 +42,14 @@ export class Game {
     this.sun = new THREE.DirectionalLight('#fff4e0', 1);
     this.sun.position.set(4, 14, 9);
     this.scene.add(this.hemi, this.sun);
+    // 蓋板特寫用的第二鏡頭：只看 layer 1（球員、球、粒子），燈光也要在該 layer
+    this.hemi.layers.enable(1);
+    this.sun.layers.enable(1);
+    this.cam2 = new THREE.PerspectiveCamera(30, 2, 0.1, 60);
+    this.cam2.layers.set(1);
+    this.ci = null;
+    this.ciBg = null;
+    this.ciWin = document.getElementById('ciWindow');
 
     this.court = new Court(this.scene);
     this.fx = new Effects(this.scene);
@@ -116,8 +126,61 @@ export class Game {
     this.slowT = TUNING.slowmoTime;
   }
 
+  // 蓋板特寫：帶狀視窗裡用第二鏡頭拍球員的臉，期間遊戲放慢
+  cutin(player, title, sub, time, slow) {
+    if (this.match.demo || this.state !== 'playing') return;
+    const team = player.teamDef;
+    this.ci = { p: player, t: 0, T: time, slow, side: Math.random() < 0.5 ? 1 : -1 };
+    this.ciBg?.dispose();
+    this.ciBg = cutinTexture(team.color || team.jersey, team.trim);
+    this.ui.cutin(title, sub, team, time);
+    this.audio.cutin();
+  }
+
+  endCutin() {
+    if (!this.ci) return;
+    this.ci = null;
+    this.ui.cutinEnd();
+  }
+
+  _renderCutin() {
+    const ci = this.ci;
+    const r = this.ciWin.getBoundingClientRect();
+    const c = this.canvas.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return;
+    const x = r.left - c.left;
+    const y = c.bottom - r.bottom;
+    const p = ci.p;
+    // 鏡頭放在球員臉的正前方略偏一側
+    _v.setFromMatrixPosition(p.vis.headQ.group.matrixWorld);
+    const sh = Math.sin(p.heading);
+    const ch = Math.cos(p.heading);
+    const dist = 1.75 + ci.t * 0.25;
+    const side = ci.side * 0.6;
+    const cam = this.cam2;
+    cam.position.set(_v.x + sh * dist + ch * side, _v.y + 0.05, _v.z + ch * dist - sh * side);
+    cam.lookAt(_v.x, _v.y - 0.1, _v.z);
+    cam.aspect = r.width / r.height;
+    cam.updateProjectionMatrix();
+    const R = this.renderer;
+    const scene = this.scene;
+    const bg = scene.background;
+    const fog = scene.fog;
+    scene.background = this.ciBg;
+    scene.fog = null;
+    R.setScissorTest(true);
+    R.setViewport(x, y, r.width, r.height);
+    R.setScissor(x, y, r.width, r.height);
+    R.render(scene, cam);
+    R.setScissorTest(false);
+    R.setViewport(0, 0, this.stageW, this.stageH);
+    scene.background = bg;
+    scene.fog = fog;
+  }
+
   // ───────── 狀態流程 ─────────
   _newMatch(opts) {
+    this.endCutin();
     this.match?.dispose();
     this.match = new Match(this, opts);
     this.ui.setTeams(opts.teams[0], opts.teams[1]);
@@ -147,6 +210,7 @@ export class Game {
 
   pause() {
     if (this.state !== 'playing') return;
+    this.endCutin();
     this.state = 'paused';
     this.ui.show('pause');
   }
@@ -205,6 +269,11 @@ export class Game {
       this.slowT -= raw;
       scale *= TUNING.slowmo;
     }
+    if (this.ci) {
+      this.ci.t += raw;
+      scale *= this.ci.slow;
+      if (this.ci.t >= this.ci.T) this.endCutin();
+    }
     const dt = this.state === 'paused' ? 0 : raw * scale;
     this.input.poll();
     const m = this.match;
@@ -216,6 +285,7 @@ export class Game {
     this._camera(raw);
     if (this.state !== 'menu') this.ui.update(m);
     this.renderer.render(this.scene, this.camera);
+    if (this.ci) this._renderCutin();
   }
 
   _camera(dt) {

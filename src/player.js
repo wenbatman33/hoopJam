@@ -310,6 +310,7 @@ export class Player {
     this.vel.set(0, 0, 0);
     this.vy = 0;
     if (!this.onFire) this.turbo = Math.max(0, this.turbo - 0.12);
+    m.onDunkStart(this);
   }
 
   _dunk(dt) {
@@ -587,6 +588,14 @@ export class Player {
     v.rig.rotation.x = this.lean + flip;
     v.pose(pose, sharp);
     v.update(dt);
+
+    // 表情
+    const st = this.state;
+    let mood = 'normal';
+    if (st === 'down') mood = 'dizzy';
+    else if (st === 'shoot' || st === 'dunk' || st === 'steal' || st === 'shove' || st === 'block') mood = 'effort';
+    else if (this.cheerT > 0 || this.onFire) mood = 'happy';
+    v.setFace(mood);
 
     // 著火
     if (this.onFire) {

@@ -64,8 +64,10 @@ html, body {
   justify-content: space-between;
 }
 .sb-team.away { border-radius: 4px 10px 10px 4px; }
-.sb-abbr { font-size: 15px; letter-spacing: 0.5px; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5); }
-.sb-team b { font-size: 30px; font-weight: 400; line-height: 1; text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5); min-width: 38px; text-align: center; }
+.sb-team { color: var(--fg, #fff); --sh: rgba(0, 0, 0, 0.5); }
+.sb-team.light, .team-card.light, .fs-team.light, .tg-chip.light { --sh: rgba(255, 255, 255, 0.45); }
+.sb-abbr { font-size: 15px; letter-spacing: 0.5px; text-shadow: 0 2px 0 var(--sh); }
+.sb-team b { font-size: 30px; font-weight: 400; line-height: 1; text-shadow: 0 3px 0 var(--sh); min-width: 38px; text-align: center; }
 .sb-team.pulse b { animation: scorePulse 0.5s ease-out; }
 @keyframes scorePulse { 0% { scale: 1.9; color: var(--gold); } 100% { scale: 1; } }
 .sb-mid {
@@ -212,6 +214,43 @@ body.touch .key-only { display: none; }
 }
 body.dev #banner { opacity: 1; animation: none; }
 
+/* 蓋板動畫（球員特寫過場）*/
+#cutin { position: absolute; left: 0; width: 100%; translate: 0 -50%; pointer-events: none; z-index: 4; --c: #e3312f; --t: #ffd23f; --dur: 1s; --s: 1; }
+.ci-band {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-top: calc(5px * var(--s)) solid var(--ink);
+  border-bottom: calc(5px * var(--s)) solid var(--ink);
+  box-shadow: 0 calc(-5px * var(--s)) 0 var(--t), 0 calc(5px * var(--s)) 0 var(--t), 0 0 50px rgba(0, 0, 0, 0.7);
+  transform-origin: center;
+  animation: ciBand var(--dur) linear both;
+}
+#ciWindow { position: absolute; inset: 0; }
+/* 速度線 */
+.ci-band::after {
+  content: '';
+  position: absolute;
+  inset: 0 -60px;
+  background: repeating-linear-gradient(96deg, transparent 0 26px, rgba(255, 255, 255, 0.16) 26px 29px, transparent 29px 61px, rgba(255, 255, 255, 0.09) 61px 66px);
+  animation: ciLines 0.22s linear infinite;
+}
+.ci-band::before { content: ''; position: absolute; inset: 0; background: #fff; animation: ciFlash var(--dur) linear both; z-index: 1; }
+.ci-title, .ci-sub {
+  position: absolute;
+  white-space: nowrap;
+  -webkit-text-stroke: calc(2px * var(--s)) var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 0 calc(4px * var(--s)) 0 var(--ink);
+}
+.ci-title { left: 4%; bottom: 7%; font-family: var(--tc); font-weight: 900; font-size: calc(36px * var(--s)); color: #fff; animation: ciTitle var(--dur) cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+.ci-sub { right: 4%; top: 7%; font-family: var(--en), var(--tc); font-size: calc(26px * var(--s)); color: var(--t); animation: ciSub var(--dur) cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+@keyframes ciBand { 0% { transform: scaleY(0); } 9% { transform: scaleY(1.08); } 14% { transform: scaleY(1); } 90% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
+@keyframes ciFlash { 0% { opacity: 0.9; } 16% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes ciLines { to { transform: translateX(-66px); } }
+@keyframes ciTitle { 0% { opacity: 0; transform: translateX(-70%) skewX(-10deg); } 16% { opacity: 1; transform: translateX(0) skewX(-10deg); } 88% { opacity: 1; transform: translateX(4%) skewX(-10deg); } 100% { opacity: 0; transform: translateX(40%) skewX(-10deg); } }
+@keyframes ciSub { 0% { opacity: 0; transform: translateX(70%) skewX(-10deg); } 18% { opacity: 1; transform: translateX(0) skewX(-10deg); } 88% { opacity: 1; transform: translateX(-4%) skewX(-10deg); } 100% { opacity: 0; transform: translateX(-40%) skewX(-10deg); } }
+
 /* 飄字 */
 #popups { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .popup {
@@ -284,10 +323,12 @@ body.dev #banner { opacity: 1; animation: none; }
   text-align: left;
   box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5);
 }
-.team-card .tc-name { font-family: var(--en); font-size: 21px; line-height: 1.1; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5); display: flex; justify-content: space-between; align-items: baseline; }
-.team-card .tc-name small { font-family: var(--tc); font-weight: 900; font-size: 14px; color: var(--t); }
+.team-card { --sh: rgba(0, 0, 0, 0.5); cursor: pointer; }
+.team-card .tc-name { font-family: var(--en); font-size: 20px; line-height: 1.1; color: var(--fg, #fff); text-shadow: 0 2px 0 var(--sh); display: flex; justify-content: space-between; align-items: baseline; gap: 6px; white-space: nowrap; }
+.team-card .tc-name small { font-family: var(--tc); font-weight: 900; font-size: 13px; color: var(--fg, #fff); opacity: 0.92; text-shadow: none; }
 .team-card .tc-players { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 5px; }
-.tc-player { background: rgba(7, 11, 22, 0.55); border-radius: 8px; padding: 4px 7px 5px; font-size: 11px; }
+.tc-player { background: rgba(7, 11, 22, 0.62); border-radius: 8px; padding: 4px 7px 5px; font-size: 11px; color: #fff; }
+.tc-player .en { font-size: 9px; font-weight: 700; color: #a9b8d6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tc-player .nm { font-weight: 900; font-size: 13px; display: flex; justify-content: space-between; }
 .tc-player .nm i { font-family: var(--en); font-style: normal; color: var(--t); }
 .stat { display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 4px; margin-top: 2px; font-weight: 700; font-size: 10px; color: #c9d5ee; }
@@ -338,9 +379,9 @@ body.dev #banner { opacity: 1; animation: none; }
 .over-title { color: var(--gold); font-size: 56px; }
 .over-title.lose { color: #9fb0d0; }
 .final-score { display: flex; align-items: center; gap: 14px; font-family: var(--en); }
-.final-score .fs-team { --c: #e3312f; min-width: 118px; padding: 8px 12px; border: 3px solid var(--ink); border-radius: 12px; background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 60%, #000)); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5); }
+.final-score .fs-team { --c: #e3312f; --sh: rgba(0, 0, 0, 0.5); color: var(--fg, #fff); min-width: 118px; padding: 8px 12px; border: 3px solid var(--ink); border-radius: 12px; background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 60%, #000)); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.5); }
 .final-score .fs-team small { display: block; font-size: 13px; }
-.final-score .fs-team b { font-size: 46px; font-weight: 400; line-height: 1; text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5); }
+.final-score .fs-team b { font-size: 46px; font-weight: 400; line-height: 1; text-shadow: 0 3px 0 var(--sh); }
 .final-score .vs { font-size: 16px; color: #8fa3c8; }
 .stats { width: 100%; max-width: 380px; font-size: 12px; }
 .stats table { width: 100%; border-collapse: collapse; background: rgba(7, 11, 22, 0.7); border: 3px solid var(--ink); border-radius: 10px; overflow: hidden; }
@@ -349,6 +390,33 @@ body.dev #banner { opacity: 1; animation: none; }
 .stats td.nm { text-align: left; padding-left: 9px; white-space: nowrap; }
 .stats td.nm i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; border: 1.5px solid #fff; }
 .stats td.pts { font-family: var(--en); color: var(--gold); font-size: 14px; }
+
+/* 選隊格狀選單 */
+#gridScreen { z-index: 6; gap: 1.2%; }
+.tg-title { font-size: 30px; }
+.tg-conf { font-size: 12px; font-weight: 900; letter-spacing: 3px; color: #8fa3c8; }
+.tg-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; max-width: 380px; }
+.tg-chip {
+  --c: #333;
+  --sh: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 0 5px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 62%, #000));
+  color: var(--fg, #fff);
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+.tg-chip b { font-family: var(--en); font-weight: 400; font-size: 15px; line-height: 1; text-shadow: 0 2px 0 var(--sh); }
+.tg-chip span { font-family: var(--tc); font-weight: 900; font-size: 10px; white-space: nowrap; }
+.tg-chip.on { outline: 3px solid var(--gold); outline-offset: 1px; }
+.tg-chip:disabled { opacity: 0.3; cursor: default; }
+.tg-foot { display: flex; gap: 10px; margin-top: 4px; }
+.legal { font-size: 9.5px; font-weight: 700; color: rgba(255, 255, 255, 0.45); }
 
 /* 載入 */
 #loading {

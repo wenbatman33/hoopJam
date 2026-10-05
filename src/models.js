@@ -4,6 +4,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { TUNING, VISUAL } from './config.js';
 import { numberTexture } from './textures.js';
 import { POSE_KEYS } from './poses.js';
+import { buildHead } from './head.js';
 
 // GLB 骨架球員（Quaternius CC0 模型）
 // - 依骨骼權重把連帽衫 / 長褲重新上色成無袖球衣 + 短褲
@@ -25,6 +26,10 @@ const _wq = new THREE.Quaternion();
 const _dq = new THREE.Quaternion();
 const _lq = new THREE.Quaternion();
 const UP = new THREE.Vector3(0, 1, 0);
+
+// Q 版大頭在模型原始座標（綁定姿勢、公尺）中的球心與半徑；Head 骨頭在 y≈1.587
+const HEAD_CENTER = new THREE.Vector3(0, 1.717, 0.05);
+const HEAD_RADIUS = 0.16;
 
 export async function loadModels() {
   const gltf = await new GLTFLoader().loadAsync(BASE + 'baller.glb');
@@ -53,6 +58,7 @@ export async function loadModels() {
   const box = new THREE.Box3().setFromObject(scene, true);
   const chest = scene.getObjectByName('Chest');
   const chestBindInv = chest.matrixWorld.clone().invert();
+  const headBindInv = scene.getObjectByName('Head').matrixWorld.clone().invert();
 
   // 預先計算「哪些頂點改上膚色」：手臂 → 無袖、小腿 → 短褲
   scene.traverse((o) => {
@@ -76,7 +82,7 @@ export async function loadModels() {
     geo.userData.skinMask = mask;
   });
 
-  return { scene, clips, height: box.max.y - box.min.y, minY: box.min.y, chestBindInv };
+  return { scene, clips, height: box.max.y - box.min.y, minY: box.min.y, chestBindInv, headBindInv };
 }
 
 // 依材質名稱與所屬網格判斷部位
@@ -94,7 +100,7 @@ function partTag(mesh) {
 }
 
 export class Baller {
-  // look: { jersey, shorts, trim, skin, hair, num, h }
+  // look: { jersey, shorts, trim, skin, hair（髮型）, hairColor, beard, band, num, h }
   constructor(models, look) {
     this.root = new THREE.Group(); // 位置 = 腳底、rotation.y = 面向
     this.rig = new THREE.Group(); // 身體中心樞紐（前傾 / 空翻）
@@ -116,6 +122,7 @@ export class Baller {
 
     this._paint(model, look);
     this._numbers(models, look);
+    this._head(models, look);
     this.setHeadScale(TUNING.headScale);
 
     // 動畫
@@ -138,6 +145,8 @@ export class Baller {
     this._sharp = 14;
     this.mixer.update(0);
     for (const b of this.arm) b.anim.copy(b.bone.quaternion);
+    // 蓋板特寫鏡頭只拍 layer 1
+    this.root.traverse((o) => o.layers.enable(1));
   }
 
   // 重新上色：連帽衫 → 無袖球衣、長褲 → 短褲
@@ -148,6 +157,8 @@ export class Baller {
       if (!o.isSkinnedMesh) return;
       o.frustumCulled = false;
       const tag = partTag(o);
+      // 原本的頭髮與五官由 Q 版大頭取代（保留頭部膚色網格當脖子）
+      if (tag === 'hair' || tag === 'brow' || tag === 'eye') { o.visible = false; return; }
       const mat = o.material.clone();
       mat.roughness = 0.7;
       mat.metalness = 0;
@@ -167,14 +178,27 @@ export class Baller {
         mat.vertexColors = true;
         mat.color.set('#ffffff');
       } else if (tag === 'skin') mat.color.copy(cSkin);
-      else if (tag === 'hair') mat.color.set(look.hair);
-      else if (tag === 'brow') mat.color.set(look.hair).multiplyScalar(0.6);
-      else if (tag === 'eye') mat.color.set('#120c08');
       else if (tag === 'shoe') mat.color.set('#f4f4f4');
       else if (tag === 'trim') mat.color.set(look.trim);
       o.material = mat;
       this.mats.push(mat);
     });
+  }
+
+  // Q 版大頭：掛在 Head 骨頭上，隨 headScale 放大
+  _head(models, look) {
+    this.headQ = buildHead(look);
+    const hg = this.headQ.group;
+    hg.matrixAutoUpdate = false;
+    _m.compose(HEAD_CENTER, _lq.identity(), _dir.setScalar(HEAD_RADIUS));
+    hg.matrix.copy(models.headBindInv).multiply(_m);
+    this.bones.Head.add(hg);
+    this.mats.push(...this.headQ.mats);
+  }
+
+  // 表情：normal / effort / happy / dizzy
+  setFace(mood) {
+    this.headQ.setMood(mood);
   }
 
   // 球衣號碼：掛在 Chest 骨頭上，前後各一
@@ -217,6 +241,7 @@ export class Baller {
   // 著火時讓材質發光
   setGlow(v) {
     for (const m of this.mats) {
+      if (m.transparent) continue; // 臉部貼片不發光
       m.emissive.setRGB(1, 0.35, 0.05);
       m.emissiveIntensity = v;
     }
@@ -283,5 +308,6 @@ export class Baller {
     this.mixer.stopAllAction();
     this.root.removeFromParent();
     for (const m of this.mats) m.dispose();
+    this.headQ.dispose();
   }
 }
