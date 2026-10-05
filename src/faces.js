@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-// Q 版卡通臉：用 canvas 畫大眼五官，貼在頭部前方的球面貼片上
-// 每位球員依 look（膚色、髮色、鬍型）產生四種表情：normal / effort / happy / dizzy
+// 備用臉：還沒有 AI 臉部圖的球員，用 canvas 畫卡通五官貼到頭上
+// 依 look（膚色、髮色、鬍型）產生四種表情：normal / effort / happy / dizzy
 
 const S = 256;
 const CX = S / 2;
@@ -9,6 +9,9 @@ const EYE_Y = 124;
 const EYE_DX = 47;
 
 export const MOODS = ['normal', 'effort', 'happy', 'dizzy'];
+// 這張程式繪製的臉，眼睛高度與兩眼間距佔整張圖的比例（head.js 擺放立體五官用）
+export const FALLBACK_EYE = EYE_Y / S;
+export const FALLBACK_IPD = (EYE_DX * 2) / S;
 
 const css = (c) => `#${c.getHexString()}`;
 
@@ -196,6 +199,9 @@ export function faceTexture(look, mood) {
   const browCol = css(hair.clone().multiplyScalar(0.7));
   const bearded = look.beard && look.beard !== 'none' && look.beard !== 'mustache';
 
+  // 整張圖會貼滿前半顆頭，所以先鋪膚色
+  g.fillStyle = css(skin);
+  g.fillRect(0, 0, S, S);
   beard(g, look.beard, css(hair));
   // 腮紅
   g.fillStyle = 'rgba(255, 80, 80, 0.2)';

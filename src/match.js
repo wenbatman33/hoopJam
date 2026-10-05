@@ -35,7 +35,14 @@ export class Match {
       for (let idx = 0; idx < 2; idx++) {
         const def = this.teams[team];
         const info = def.players[idx];
-        const baller = new Baller(game.models, { ...info, jersey: def.jersey, shorts: def.shorts, trim: def.trim });
+        // 有 AI 臉部圖的球員：膚色跟著圖走，頭型照圖的輪廓
+        const face = game.faceDB[info.id] || null;
+        const look = { ...info, jersey: def.jersey, shorts: def.shorts, trim: def.trim, face };
+        if (face) {
+          look.skin = face.skin;
+          look.faceUrl = `./assets/faces/${face.file}`;
+        }
+        const baller = new Baller(game.models, look);
         const p = new Player(this, team, idx, info, def, baller);
         // 示範賽雙方都吃難度；正式比賽只有對手吃難度
         if (team === 1 || this.demo) p.speedMul = this.diff.speed;

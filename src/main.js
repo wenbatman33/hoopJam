@@ -13,8 +13,10 @@ async function boot() {
     Promise.all([document.fonts.load('40px "Bungee"'), document.fonts.load('900 20px "Noto Sans TC"')]),
     new Promise((r) => setTimeout(r, 2500)),
   ]).catch(() => {});
-  const [models] = await Promise.all([loadModels(), fonts]);
-  const game = new Game(document.getElementById('game'), models);
+  // 臉部資料庫不存在也沒關係，球員會退回程式繪製的臉
+  const faces = fetch('./assets/faces/faces.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  const [models, faceDB] = await Promise.all([loadModels(), faces, fonts]);
+  const game = new Game(document.getElementById('game'), models, faceDB);
   new DevTools(game);
   window.__game = game; // 除錯用
   const ld = document.getElementById('loading');

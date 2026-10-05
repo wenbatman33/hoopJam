@@ -291,8 +291,8 @@ body.dev #banner { opacity: 1; animation: none; }
 .screen.dim { background: rgba(7, 11, 22, 0.78); backdrop-filter: blur(3px); }
 
 .logo { font-family: var(--en); line-height: 0.88; transform: rotate(-4deg); margin-bottom: 1%; }
-.logo-top { font-size: 66px; color: #fff; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--ink); }
-.logo-bot { font-size: 106px; color: #ff7a1a; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 8px 0 var(--ink), 0 0 40px rgba(255, 122, 26, 0.6); }
+.logo-top { font-size: 58px; color: #fff; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--ink); }
+.logo-bot { font-size: 94px; color: #ff7a1a; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; text-shadow: 0 8px 0 var(--ink), 0 0 40px rgba(255, 122, 26, 0.6); }
 .logo-sub { font-family: var(--tc); font-weight: 900; font-size: 17px; letter-spacing: 3px; color: var(--gold); margin-top: 10px; text-shadow: 0 2px 0 var(--ink); }
 
 .pick { width: 100%; max-width: 380px; }
@@ -326,9 +326,29 @@ body.dev #banner { opacity: 1; animation: none; }
 .team-card { --sh: rgba(0, 0, 0, 0.5); cursor: pointer; }
 .team-card .tc-name { font-family: var(--en); font-size: 20px; line-height: 1.1; color: var(--fg, #fff); text-shadow: 0 2px 0 var(--sh); display: flex; justify-content: space-between; align-items: baseline; gap: 6px; white-space: nowrap; }
 .team-card .tc-name small { font-family: var(--tc); font-weight: 900; font-size: 13px; color: var(--fg, #fff); opacity: 0.92; text-shadow: none; }
-.team-card .tc-players { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 5px; }
+.team-card .tc-players { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; margin-top: 5px; }
 .tc-player { background: rgba(7, 11, 22, 0.62); border-radius: 8px; padding: 4px 7px 5px; font-size: 11px; color: #fff; }
 .tc-player .en { font-size: 9px; font-weight: 700; color: #a9b8d6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 球員頭像 */
+.tc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.tc-pic { position: relative; flex: none; line-height: 0; }
+.tc-pic i { position: absolute; right: -5px; bottom: -4px; font-family: var(--en); font-style: normal; font-size: 10px; line-height: 1; padding: 2px 4px; border-radius: 6px; background: var(--ink); color: var(--t); }
+.tc-head .nm { display: block; white-space: nowrap; font-size: 15px; }
+.tc-player .en { margin: 0 0 3px 1px; }
+.tc-face {
+  flex: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  border: 2px solid var(--ink);
+  background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--c) 78%, #fff), color-mix(in srgb, var(--c) 55%, #000));
+  object-fit: cover;
+}
+.tc-face:not([src]) { visibility: hidden; }
+.tc-faces { display: flex; gap: 5px; }
+.team-card.small { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.team-card.small .tc-name { flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.team-card.small .tc-face { width: 40px; height: 40px; }
 .tc-player .nm { font-weight: 900; font-size: 13px; display: flex; justify-content: space-between; }
 .tc-player .nm i { font-family: var(--en); font-style: normal; color: var(--t); }
 .stat { display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 4px; margin-top: 2px; font-weight: 700; font-size: 10px; color: #c9d5ee; }

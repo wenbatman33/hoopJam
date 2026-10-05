@@ -7,6 +7,7 @@ import { Input } from './input.js';
 import { UI } from './ui.js';
 import { Match } from './match.js';
 import { cutinTexture } from './textures.js';
+import { PortraitStudio } from './portrait.js';
 
 // 遊戲主體：渲染、鏡頭、狀態流程（選單示範賽 → 比賽 → 節間 → 終場）
 
@@ -15,9 +16,11 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const _v = new THREE.Vector3();
 
 export class Game {
-  constructor(canvas, models) {
+  constructor(canvas, models, faceDB = {}) {
     this.canvas = canvas;
     this.models = models;
+    this.faceDB = faceDB; // assets/faces/faces.json：每位球員的臉部貼圖與頭型資料
+    this._headKey = '';
     this.app = document.getElementById('app');
     this.state = 'menu'; // menu | playing | paused | break | over
     this.forcedProfile = null;
@@ -33,6 +36,7 @@ export class Game {
     const r = (this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }));
     r.outputColorSpace = THREE.SRGBColorSpace;
     r.toneMapping = THREE.ACESFilmicToneMapping;
+    this.portraits = new PortraitStudio(r, faceDB); // 選隊卡片用的球員頭像
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#05080f');
     this.scene.fog = new THREE.Fog('#05080f', 45, 95);
@@ -110,7 +114,12 @@ export class Game {
     this.hemi.intensity = VISUAL.hemi;
     this.sun.intensity = VISUAL.sun;
     this.court.applyVisual();
+    // 頭部立體參數有變才重建
+    const headKey = [VISUAL.headDepth, VISUAL.faceNose, VISUAL.faceBrow, VISUAL.faceEye, VISUAL.faceLip].join();
+    const rebuild = this._headKey && headKey !== this._headKey;
+    this._headKey = headKey;
     if (this.match) for (const p of this.match.players) {
+      if (rebuild) p.vis.rebuildHead();
       p.vis.applyNumbers();
       p.vis.setHeadScale(TUNING.headScale);
       if (p.team === 1 || this.match.demo) p.speedMul = this.match.diff.speed;

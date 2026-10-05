@@ -1,0 +1,247 @@
+{
+  "styleBase": "Head-and-face portrait for a 1990s arcade basketball video game, bold comic-book caricature style: thick confident black ink outlines, cel-shaded flat colors with one or two hard-edged shadow tones, slightly exaggerated strong facial structure (defined jawline, cheekbones and brow), an adult pro athlete with a cool, tough attitude. NOT cute, NOT chibi, NOT anime: normal-sized eyes, no blush, no sparkles. Strict front view, perfectly symmetrical, head upright, looking straight at the camera, mouth closed. The scalp is completely bald and smooth with NO hair on top of the head (hair is added later in 3D), but keep the eyebrows and the facial hair exactly as described. No neck, no shoulders, no clothing, no headband, no hat, no jewelry. Only the head, centered, filling about 85 percent of the image height, on a perfectly flat solid pure green background (#00FF00) with no gradient and no cast shadow. No text, no border, no watermark.",
+  "size": 1024,
+  "outDir": "assets_src/faces_raw",
+  "items": [
+    {
+      "id": "ATL_1",
+      "prompt": "Subject: a man with medium-brown skin, lean oval face, light stubble along the jaw and a thin mustache, calm confident look"
+    },
+    {
+      "id": "ATL_3",
+      "prompt": "Subject: a man with medium-brown skin, slim face, neatly trimmed goatee with a thin mustache, sharp eyebrows, focused eyes"
+    },
+    {
+      "id": "BOS_0",
+      "prompt": "Subject: a man with light-brown skin, youthful oval face, thin chin-strap beard with a small goatee, calm slight smirk"
+    },
+    {
+      "id": "BOS_9",
+      "prompt": "Subject: a man with light-brown skin, long narrow face with a high forehead, light stubble, serious steady expression"
+    },
+    {
+      "id": "BKN_17",
+      "prompt": "Subject: a man with light-brown skin, long face, clean-shaven with a faint mustache, relaxed heavy-lidded eyes"
+    },
+    {
+      "id": "BKN_30",
+      "prompt": "Subject: a man with medium-brown skin, broad round face, full short black beard, heavy brow, fierce scowl"
+    },
+    {
+      "id": "CHA_24",
+      "prompt": "Subject: a man with medium-brown skin, slim long youthful face, clean-shaven, cool relaxed expression"
+    },
+    {
+      "id": "CHA_7",
+      "prompt": "Subject: a man with fair skin, square boyish face, clean-shaven, light-brown eyebrows, focused but friendly"
+    },
+    {
+      "id": "CHI_3",
+      "prompt": "Subject: a man with fair skin, long oval face, clean-shaven, brown eyebrows, relaxed smirk"
+    },
+    {
+      "id": "CHI_14",
+      "prompt": "Subject: a man with fair skin, long angular face with sharp cheekbones, clean-shaven, brown eyebrows, intense stare"
+    },
+    {
+      "id": "CLE_45",
+      "prompt": "Subject: a man with medium-brown skin, compact face with a strong jaw, neat goatee with a thin mustache, energetic confident closed-mouth grin"
+    },
+    {
+      "id": "CLE_1",
+      "prompt": "Subject: a man with medium-brown skin, wide face, an enormous thick bushy black beard covering the whole lower face and hanging well below the chin, thick mustache, sleepy cool half-closed eyes"
+    },
+    {
+      "id": "DET_2",
+      "prompt": "Subject: a man with light-brown skin, oval face, light stubble and a thin mustache, calm poised expression"
+    },
+    {
+      "id": "DET_0",
+      "prompt": "Subject: a man with dark-brown skin, wide strong young face, clean-shaven, stern expression"
+    },
+    {
+      "id": "IND_0",
+      "prompt": "Subject: a man with light-brown skin, slim face, large friendly eyes, clean-shaven with a faint mustache, slight smile"
+    },
+    {
+      "id": "IND_43",
+      "prompt": "Subject: a man with dark-brown skin, long face with high cheekbones, short goatee, intense eyes"
+    },
+    {
+      "id": "MIA_7",
+      "prompt": "Subject: a man with dark-brown skin, long angular face with a very strong jaw and prominent cheekbones, light stubble, fierce determined glare"
+    },
+    {
+      "id": "MIA_13",
+      "prompt": "Subject: a man with dark-brown skin, broad face, light stubble beard, serious calm expression"
+    },
+    {
+      "id": "MIL_11",
+      "prompt": "Subject: a man with fair skin, slim youthful face, clean-shaven, light-brown eyebrows, cocky smirk"
+    },
+    {
+      "id": "MIL_3",
+      "prompt": "Subject: a man with medium-brown skin, long face, full neat short beard, calm expression"
+    },
+    {
+      "id": "NYK_11",
+      "prompt": "Subject: a man with light-brown skin, broad square face, full short dark beard, thick eyebrows, determined look"
+    },
+    {
+      "id": "NYK_32",
+      "prompt": "Subject: a man with light-brown skin, long oval face, thin chin-strap goatee, heavy-lidded eyes"
+    },
+    {
+      "id": "ORL_5",
+      "prompt": "Subject: a man with light-brown skin, broad youthful face, clean-shaven with a faint mustache, confident look"
+    },
+    {
+      "id": "ORL_22",
+      "prompt": "Subject: a man with fair skin, long face, clean-shaven, brown eyebrows, friendly focused look"
+    },
+    {
+      "id": "PHI_23",
+      "prompt": "Subject: a man with dark-brown skin, broad powerful face with a wide jaw, thick full black beard joined to the mustache, strong furrowed brow, creased forehead, intense commanding stare"
+    },
+    {
+      "id": "PHI_21",
+      "prompt": "Subject: a man with dark-brown skin, large long face, full short beard, wide nose, confident smirk"
+    },
+    {
+      "id": "TOR_2",
+      "prompt": "Subject: a man with medium-brown skin, completely expressionless stone face, light stubble with a thin mustache, broad nose, heavy brow"
+    },
+    {
+      "id": "TOR_4",
+      "prompt": "Subject: a man with medium-brown skin, round youthful face, clean-shaven, energetic closed-mouth smile"
+    },
+    {
+      "id": "WAS_3",
+      "prompt": "Subject: a man with light-brown skin, small narrow boyish face, thin faint mustache, sly smirk"
+    },
+    {
+      "id": "WAS_23",
+      "prompt": "Subject: a man with medium-brown skin, long face, thick eyebrows that join in the middle into one single unibrow, thin goatee, serious look"
+    },
+    {
+      "id": "DAL_32",
+      "prompt": "Subject: a man with fair skin, young lean face with a sharp jaw, clean-shaven, dark eyebrows, intense competitive glare"
+    },
+    {
+      "id": "DAL_11",
+      "prompt": "Subject: a man with medium-brown skin, slim face, full neatly trimmed beard, calm wise eyes"
+    },
+    {
+      "id": "DEN_15",
+      "prompt": "Subject: a man with fair slightly flushed skin, big round soft face with heavy cheeks, short light-brown stubble, small tired eyes, completely deadpan expression"
+    },
+    {
+      "id": "DEN_27",
+      "prompt": "Subject: a man with light-brown skin, lean face, thin goatee with a mustache, sharp focused eyes"
+    },
+    {
+      "id": "GSW_30",
+      "prompt": "Subject: a man with light-tan skin, slim youthful face, light goatee with a thin mustache, hazel-green eyes, confident slight smile"
+    },
+    {
+      "id": "GSW_10",
+      "prompt": "Subject: a man with medium-brown skin, angular face with a strong jaw, light stubble, intense glare"
+    },
+    {
+      "id": "HOU_7",
+      "prompt": "Subject: a man with medium-brown skin, very long narrow face, scruffy thin goatee and mustache, calm cold eyes"
+    },
+    {
+      "id": "HOU_28",
+      "prompt": "Subject: a man with fair skin, broad face, dark stubble, thick dark eyebrows, calm expression"
+    },
+    {
+      "id": "LAC_7",
+      "prompt": "Subject: a man with medium-brown skin, long thin face, thin goatee, sleepy eyes"
+    },
+    {
+      "id": "LAC_10",
+      "prompt": "Subject: a man with medium-brown skin, small youthful face, clean-shaven with a faint mustache, friendly look"
+    },
+    {
+      "id": "LAL_77",
+      "prompt": "Subject: a man with fair skin, round full face, short scruffy light-brown beard, light-brown eyebrows, small smirk"
+    },
+    {
+      "id": "LAL_15",
+      "prompt": "Subject: a man with fair skin, lean face, light-brown stubble, light-brown eyebrows, gritty focused look"
+    },
+    {
+      "id": "MEM_27",
+      "prompt": "Subject: a man with light-brown skin, broad young face, clean-shaven, calm expression"
+    },
+    {
+      "id": "MEM_14",
+      "prompt": "Subject: a man with light-tan skin, very long large face, clean-shaven, dark eyebrows, calm expression"
+    },
+    {
+      "id": "MIN_5",
+      "prompt": "Subject: a man with dark-brown skin, strong square face, light stubble goatee, big confident closed-mouth grin"
+    },
+    {
+      "id": "MIN_1",
+      "prompt": "Subject: a man with light-brown skin, slim boyish face, clean-shaven, playful smirk"
+    },
+    {
+      "id": "NOP_1",
+      "prompt": "Subject: a man with medium-brown skin, very wide round powerful face, light stubble, fierce look"
+    },
+    {
+      "id": "NOP_25",
+      "prompt": "Subject: a man with light-brown skin, long slim face, clean-shaven, calm expression"
+    },
+    {
+      "id": "OKC_2",
+      "prompt": "Subject: a man with medium-brown skin, slim angular face, light stubble and a thin mustache, cool unbothered expression"
+    },
+    {
+      "id": "OKC_8",
+      "prompt": "Subject: a man with medium-brown skin, oval face, clean-shaven with a faint mustache, friendly confident look"
+    },
+    {
+      "id": "PHX_15",
+      "prompt": "Subject: a man with light-brown skin, lean handsome face, light stubble, sharp eyebrows, cold focused stare"
+    },
+    {
+      "id": "PHX_4",
+      "prompt": "Subject: a man with light-brown skin, slim youthful face, clean-shaven, cocky look"
+    },
+    {
+      "id": "POR_1",
+      "prompt": "Subject: a man with medium-brown skin, slim angular face, clean-shaven with a faint mustache, fierce swagger"
+    },
+    {
+      "id": "POR_0",
+      "prompt": "Subject: a man with medium-brown skin, oval face, full neat short beard, calm ice-cold stare"
+    },
+    {
+      "id": "SAC_11",
+      "prompt": "Subject: a man with fair skin, broad face, full light-brown beard, light-brown eyebrows, strong brow, tough look"
+    },
+    {
+      "id": "SAC_8",
+      "prompt": "Subject: a man with light-brown skin, lean face, light stubble, calm expression"
+    },
+    {
+      "id": "SAS_1",
+      "prompt": "Subject: a man with light-brown skin, very long narrow young face with high cheekbones, clean-shaven, calm intense eyes"
+    },
+    {
+      "id": "SAS_4",
+      "prompt": "Subject: a man with medium-brown skin, slim face, clean-shaven with a faint goatee, quick sly look"
+    },
+    {
+      "id": "UTA_23",
+      "prompt": "Subject: a man with fair skin, long face, clean-shaven, blond eyebrows, calm expression"
+    },
+    {
+      "id": "UTA_20",
+      "prompt": "Subject: a man with medium-brown skin, long face, thin goatee, friendly but intense look"
+    }
+  ]
+}

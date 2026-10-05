@@ -96,13 +96,28 @@ export class UI {
     paint(el, team.color);
     el.style.setProperty('--t', luma(team.trim) < 70 ? '#ffffff' : team.trim);
     const stat = (label, v) => `<div class="stat"><span>${label}</span><div class="sbar"><b style="width:${v * 10}%"></b></div></div>`;
-    const players = small ? '' : `<div class="tc-players">${team.players.map((p) => `
+    const faceImg = (p) => `<img class="tc-face" data-pid="${p.id}" alt="${p.name}" />`;
+    if (small) {
+      el.innerHTML = `<div class="tc-name">${team.en}<small>${team.city} ${team.name}</small></div><div class="tc-faces">${team.players.map(faceImg).join('')}</div>`;
+    } else {
+      el.innerHTML = `<div class="tc-name">${team.en}<small>${team.city} ${team.name}</small></div>
+      <div class="tc-players">${team.players.map((p) => `
       <div class="tc-player">
-        <div class="nm"><span>${p.name}</span><i>#${p.num}</i></div>
+        <div class="tc-head">
+          <div class="tc-pic">${faceImg(p)}<i>#${p.num}</i></div>
+          <div class="nm">${p.name}</div>
+        </div>
         <div class="en">${p.en}</div>
         ${stat('速度', p.spd)}${stat('投籃', p.sht)}${stat('灌籃', p.dnk)}${stat('防守', p.def)}
       </div>`).join('')}</div>`;
-    el.innerHTML = `<div class="tc-name">${team.en}<small>${team.city} ${team.name}</small></div>${players}`;
+    }
+    // 頭像：用 3D 頭即時拍的小圖，拍好再填進去
+    for (const p of team.players) {
+      this.g.portraits.get(p).then((url) => {
+        const img = el.querySelector(`img[data-pid="${p.id}"]`);
+        if (img) img.src = url;
+      });
+    }
   }
 
   // 30 隊格狀選單（mode: 'home' 選自己 / 'away' 選對手）

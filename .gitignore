@@ -1,3 +1,7 @@
 node_modules
 dist
 .DS_Store
+# AI 生圖原圖（1024px）與檢查圖體積大，不進版控；處理後的貼圖在 assets/faces/
+assets_src/faces_raw/
+assets_src/faces_debug/
+scripts/*.out

@@ -70,7 +70,7 @@ export const TUNING = {
   fireStreak: 3, // 連進幾球著火
   // 角色
   playerHeight: 2.0,
-  headScale: 1.6, // 大頭比例
+  headScale: 1.6, // 大頭比例（以脖子為軸放大）
   // 節奏演出
   slowmo: 0.3, // 灌籃慢動作倍率
   slowmoTime: 0.5,
@@ -95,6 +95,12 @@ export const VISUAL = {
   numBackZ: -0.19,
   numFrontY: 1.33,
   numFrontZ: 0.21,
+  // 頭部立體感（單位：頭頂到眼睛 = 0.9）
+  headDepth: 1.08, // 前後厚度相對於寬度
+  faceNose: 0.2, // 鼻子突出
+  faceBrow: 0.05, // 眉骨
+  faceEye: 0.04, // 眼窩凹陷
+  faceLip: 0.045, // 嘴唇
 };
 
 // AI 難度（只影響對手）
@@ -139,7 +145,9 @@ const P = (name, en, num, h, [spd, sht, dnk, def], skin, hair, beard = 'none', x
 });
 // 隊伍：T(縮寫, 分區, 城市, 隊名, 英文隊名, 球衣色, 配色, 球員)
 const T = (abbr, conf, city, name, en, jersey, trim, players) => ({
-  id: abbr.toLowerCase(), abbr, conf, city, name, en, color: jersey, jersey, shorts: shade(jersey, 0.8), trim, players,
+  id: abbr.toLowerCase(), abbr, conf, city, name, en, color: jersey, jersey, shorts: shade(jersey, 0.8), trim,
+  // 球員 id = 隊名縮寫_背號，對應 assets/faces/ 的臉部貼圖
+  players: players.map((p) => ({ ...p, id: `${abbr}_${p.num}` })),
 });
 const W = '#ffffff';
 

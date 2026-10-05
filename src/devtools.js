@@ -158,6 +158,11 @@ export class DevTools {
     fv.add(VISUAL, 'shake', 0, 3, 0.05).name('震動強度').onChange(ch);
     fv.add(VISUAL, 'ringOpacity', 0, 1, 0.01).name('腳下圓環透明度').onChange(ch);
     fv.add(VISUAL, 'nearHoopOpacity', 0, 1, 0.01).name('近端籃架透明度').onChange(ch);
+    fv.add(VISUAL, 'headDepth', 0.7, 1.6, 0.01).name('頭部厚度').onChange(ch);
+    fv.add(VISUAL, 'faceNose', 0, 0.5, 0.005).name('鼻子突出').onChange(ch);
+    fv.add(VISUAL, 'faceBrow', 0, 0.2, 0.005).name('眉骨').onChange(ch);
+    fv.add(VISUAL, 'faceEye', 0, 0.15, 0.005).name('眼窩凹陷').onChange(ch);
+    fv.add(VISUAL, 'faceLip', 0, 0.15, 0.005).name('嘴唇').onChange(ch);
     fv.add(VISUAL, 'numSize', 0.1, 0.8, 0.01).name('號碼大小').onChange(ch);
     fv.add(VISUAL, 'numBackY', 0.8, 1.8, 0.005).name('背號高度').onChange(ch);
     fv.add(VISUAL, 'numBackZ', -0.4, 0, 0.005).name('背號前後').onChange(ch);

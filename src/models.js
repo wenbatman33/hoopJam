@@ -27,9 +27,25 @@ const _dq = new THREE.Quaternion();
 const _lq = new THREE.Quaternion();
 const UP = new THREE.Vector3(0, 1, 0);
 
-// Q 版大頭在模型原始座標（綁定姿勢、公尺）中的球心與半徑；Head 骨頭在 y≈1.587
-const HEAD_CENTER = new THREE.Vector3(0, 1.717, 0.05);
-const HEAD_RADIUS = 0.16;
+// 頭部單位長度換算成模型原始座標的公尺；Head 骨頭（脖子頂端）在綁定姿勢的位置
+const HEAD_UNIT = 0.16;
+const HEAD_BONE = new THREE.Vector3(0, 1.587, 0.043);
+
+// AI 臉部貼圖快取（60 張小圖，不釋放）
+const faceTextures = new Map();
+const faceLoader = new THREE.TextureLoader();
+export function loadFace(url) {
+  if (!faceTextures.has(url)) {
+    faceTextures.set(url, new Promise((ok) => {
+      faceLoader.load(url, (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = 4;
+        ok(tex);
+      }, undefined, () => ok(null));
+    }));
+  }
+  return faceTextures.get(url);
+}
 
 export async function loadModels() {
   const gltf = await new GLTFLoader().loadAsync(BASE + 'baller.glb');
@@ -92,7 +108,7 @@ function partTag(mesh) {
   if (mat === 'Purple') return /Feet/i.test(where) ? 'trim' : 'jersey';
   if (mat === 'LightBlue') return 'shorts';
   if (mat === 'White') return 'shoe';
-  if (mat === 'Skin') return 'skin';
+  if (mat === 'Skin') return /Head/i.test(where) ? 'headskin' : 'skin';
   if (mat === 'Hair') return 'hair';
   if (mat === 'Eyebrows') return 'brow';
   if (mat === 'Eye') return 'eye';
@@ -102,6 +118,7 @@ function partTag(mesh) {
 export class Baller {
   // look: { jersey, shorts, trim, skin, hair（髮型）, hairColor, beard, band, num, h }
   constructor(models, look) {
+    this._models = models;
     this.root = new THREE.Group(); // 位置 = 腳底、rotation.y = 面向
     this.rig = new THREE.Group(); // 身體中心樞紐（前傾 / 空翻）
     this.root.add(this.rig);
@@ -157,8 +174,8 @@ export class Baller {
       if (!o.isSkinnedMesh) return;
       o.frustumCulled = false;
       const tag = partTag(o);
-      // 原本的頭髮與五官由 Q 版大頭取代（保留頭部膚色網格當脖子）
-      if (tag === 'hair' || tag === 'brow' || tag === 'eye') { o.visible = false; return; }
+      // 原本的頭整顆由新的頭取代
+      if (tag === 'hair' || tag === 'brow' || tag === 'eye' || tag === 'headskin') { o.visible = false; return; }
       const mat = o.material.clone();
       mat.roughness = 0.7;
       mat.metalness = 0;
@@ -185,15 +202,29 @@ export class Baller {
     });
   }
 
-  // Q 版大頭：掛在 Head 骨頭上，隨 headScale 放大
+  // 頭：掛在 Head 骨頭上，以脖子頂端為軸隨 headScale 放大
   _head(models, look) {
-    this.headQ = buildHead(look);
-    const hg = this.headQ.group;
+    const head = buildHead(look);
+    this.headQ = head;
+    const hg = head.group;
     hg.matrixAutoUpdate = false;
-    _m.compose(HEAD_CENTER, _lq.identity(), _dir.setScalar(HEAD_RADIUS));
+    // 讓頭部座標的 anchor 點落在 Head 骨頭上
+    _v.copy(head.anchor).multiplyScalar(-HEAD_UNIT).add(HEAD_BONE);
+    _m.compose(_v, _lq.identity(), _dir.setScalar(HEAD_UNIT));
     hg.matrix.copy(models.headBindInv).multiply(_m);
     this.bones.Head.add(hg);
-    this.mats.push(...this.headQ.mats);
+    hg.traverse((o) => o.layers.enable(1));
+    this.mats.push(...head.mats);
+    if (look.faceUrl) loadFace(look.faceUrl).then((tex) => { if (tex && this.headQ === head) head.setTexture(tex); });
+  }
+
+  // DEV 調整立體參數後重建頭部
+  rebuildHead() {
+    const old = this.headQ;
+    old.group.removeFromParent();
+    this.mats = this.mats.filter((m) => !old.mats.includes(m));
+    old.dispose();
+    this._head(this._models, this.look);
   }
 
   // 表情：normal / effort / happy / dizzy
@@ -241,7 +272,7 @@ export class Baller {
   // 著火時讓材質發光
   setGlow(v) {
     for (const m of this.mats) {
-      if (m.transparent) continue; // 臉部貼片不發光
+      if (m.transparent) continue; // 號碼貼片不發光
       m.emissive.setRGB(1, 0.35, 0.05);
       m.emissiveIntensity = v;
     }
